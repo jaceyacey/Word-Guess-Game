@@ -1,4 +1,4 @@
-const pokemonArray = [
+let pokemonArray = [
   "Bulbasaur",
   "Ivysaur",
   "Venusaur",
@@ -151,6 +151,9 @@ const pokemonArray = [
   "Mewtwo",
   "Mew"
 ];
+pokemonArray = pokemonArray.map(x => {
+  return x.toUpperCase();
+});
 
 // NEW GAME
 //computer picks pokemon
@@ -180,9 +183,14 @@ let pokemon = pokemonArray[Math.floor(Math.random() * pokemonArray.length)];
 console.log(pokemon);
 
 //display blanks
+const blankArray = [];
 for (i = 0; i < pokemon.length; i++) {
-  blanks.innerHTML += "_ ";
+  blankArray.push("_ ");
+  // console.log(blankArray);
 }
+blankArray.forEach(item => {
+  blanks.innerHTML += item;
+});
 
 //user presses key
 document.onkeyup = () => {
@@ -193,4 +201,11 @@ document.onkeyup = () => {
   //reduce guesses
   guesses--;
   guessesLeft.innerHTML = guesses;
+  //update blank if letter matches
+  for (i = 0; i < pokemon.length; i++) {
+    if (letter === pokemon[i]) {
+      blankArray[i] = letter;
+    }
+  }
+  blanks.innerHTML = blankArray.join(" ");
 };
