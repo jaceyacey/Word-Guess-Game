@@ -81,7 +81,7 @@ let pokemonArray = [
   "Slowbro",
   "Magnemite",
   "Magneton",
-  "Farfetch'd",
+  "Farfetchd",
   "Doduo",
   "Dodrio",
   "Seel",
@@ -155,57 +155,101 @@ pokemonArray = pokemonArray.map(x => {
   return x.toUpperCase();
 });
 
-// NEW GAME
-//computer picks pokemon
-//display number of letters
-
-//user guesses letter
-//  adjust guesses remaining
-//  show letters guessed
-
-// WIN SCENARIO
-//  reset guesses remaining and letters guessed
-//  update win score
-//  NEW GAME
-
-// LOSS SCENARIO
-//  reset guesses remaining and letters guessed
-//  update loss score
-//  NEW GAME
-
 const blanks = document.querySelector("#blanks");
 const guessed = document.querySelector("#guessed");
 const guessesLeft = document.querySelector("#guessesLeft");
-let guesses = 15;
+const winDisplay = document.querySelector("#wins");
 
-//computer picks pokemon
-let pokemon = pokemonArray[Math.floor(Math.random() * pokemonArray.length)];
-console.log(pokemon);
+let wins = 0;
+let blankArray = [];
+let guesses = 12;
+let isInGuesses = false;
+let guessedLetters = [];
+let letter;
+let pokemon;
 
-//display blanks
-const blankArray = [];
-for (i = 0; i < pokemon.length; i++) {
-  blankArray.push("_ ");
-  // console.log(blankArray);
-}
-blankArray.forEach(item => {
-  blanks.innerHTML += item;
-});
+// somputer selects pokemon
+const selectPokemon = function() {
+  pokemon = pokemonArray[Math.floor(Math.random() * pokemonArray.length)];
+  console.log(pokemon);
+};
 
-//user presses key
-document.onkeyup = () => {
-  let letter = String.fromCharCode(event.keyCode);
-  console.log(letter);
-  //display guessed letter
-  guessed.innerHTML += letter + " ";
-  //reduce guesses
-  guesses--;
-  guessesLeft.innerHTML = guesses;
-  //update blank if letter matches
+// set up blanks
+const setupBlanks = function() {
   for (i = 0; i < pokemon.length; i++) {
-    if (letter === pokemon[i]) {
-      blankArray[i] = letter;
+    blankArray.push("_ ");
+  }
+  blankArray.forEach(item => {
+    blanks.innerHTML += item;
+  });
+};
+
+const adjustGuesses = function() {
+  for (i = 0; i <= guessedLetters.length; i++) {
+    if (guessedLetters[i] === letter) {
+      isInGuesses = true;
     }
   }
-  blanks.innerHTML = blankArray.join(" ");
+  if (!isInGuesses) {
+    //display guessed letter
+    guessedLetters.push(letter);
+    guessed.innerHTML = guessedLetters;
+    //reduce guesses
+    guesses--;
+    guessesLeft.innerHTML = guesses;
+  }
+  isInGuesses = false;
 };
+
+const playGame = function() {
+  selectPokemon();
+  setupBlanks();
+  //user presses key
+  document.onkeyup = () => {
+    letter = String.fromCharCode(event.keyCode);
+    adjustGuesses();
+    //update blank if letter matches
+    for (i = 0; i < pokemon.length; i++) {
+      if (letter === pokemon[i]) {
+        blankArray[i] = letter;
+      }
+    }
+    blanks.innerHTML = blankArray.join(" ");
+    // FULL WORD GUESSED
+    if (blankArray.join("") === pokemon) {
+      winGame();
+    }
+    if (guesses === 0) {
+      loseGame();
+    }
+  };
+};
+
+//LOSE SCENARIO
+//reset
+const loseGame = function() {
+  wins = 0;
+  winDisplay.innerHTML = wins;
+  resetGame();
+  playGame();
+};
+
+//WIN SCENARIO
+const winGame = function() {
+  wins++;
+  winDisplay.innerHTML = wins;
+  resetGame();
+  playGame();
+};
+
+const resetGame = function() {
+  blankArray = [];
+  guesses = 12;
+  isInGuesses = false;
+  guessedLetters = [];
+  guessesLeft.innerHTML = guesses;
+  guessed.innerHTML = guessedLetters;
+  blanks.innerHTML = "";
+};
+
+playGame();
